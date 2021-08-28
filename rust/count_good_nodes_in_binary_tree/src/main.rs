@@ -49,56 +49,28 @@ impl TreeNode {
 
 struct Solution {}
 
-use std::cell::{Ref, RefCell};
+use std::borrow::Borrow;
+use std::cell::RefCell;
 use std::rc::Rc;
 impl Solution {
     pub fn good_nodes(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
-        match root.as_ref() {
-            Some(root_node) => {
-                let root_node = (**root_node).borrow();
-                let (nodes, bad_nodes) = count_bad_nodes(root_node);
-                return nodes + 1 - bad_nodes;
-            }
-            None => {
-                return 0;
-            }
+        if let Some(r) = &root {
+            let val = r.borrow().val;
+            Solution::dfs(&root, None)
+        } else {
+            0
         }
     }
-}
 
-pub fn count_bad_nodes(parent_node: Ref<TreeNode>) -> (i32, i32) {
-    let mut child_nodes = 0;
-    let mut child_bad_nodes = 0;
-    let (mut left_nodes, mut left_bad_nodes) = (0, 0);
-    match parent_node.left.as_ref() {
-        Some(left) => {
-            let left_node = (**left).borrow();
-            child_nodes += 1;
-            if left_node.val < parent_node.val {
-                child_bad_nodes += 1;
-            }
-            let tmp = count_bad_nodes(left_node);
-            left_nodes = tmp.0;
-            left_bad_nodes = tmp.1;
+    fn dfs(node: &Option<Rc<RefCell<TreeNode>>>, max: i32) -> i32 {
+        if let Some(n) = node {
+            let val = n.borrow().val;
+            let m = max.max(val);
+            (if m == val { 1 } else { 0 })
+                + Solution::dfs(&n.borrow().left, m)
+                + Solution::dfs(&n.borrow().right, m)
+        } else {
+            0
         }
-        None => (),
     }
-    let (mut right_nodes, mut right_bad_nodes) = (0, 0);
-    match parent_node.right.as_ref() {
-        Some(right) => {
-            let right_node = (**right).borrow();
-            child_nodes += 1;
-            if right_node.val < parent_node.val {
-                child_bad_nodes += 1;
-            }
-            let tmp = count_bad_nodes(right_node);
-            right_nodes = tmp.0;
-            right_bad_nodes = tmp.1;
-        }
-        None => (),
-    }
-    (
-        child_nodes + right_nodes + left_nodes,
-        child_bad_nodes + right_bad_nodes + left_bad_nodes,
-    )
 }
