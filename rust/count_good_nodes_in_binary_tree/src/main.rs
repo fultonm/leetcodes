@@ -1,8 +1,8 @@
 fn main() {
-    //let tree_array = vec![Some(3), Some(1), Some(4), Some(3), None, Some(1), Some(5)];
+    let tree_array = vec![Some(3), Some(1), Some(4), Some(3), None, Some(1), Some(5)];
     //let tree_array = vec![Some(3), Some(3), None, Some(4), Some(2)];
     //let tree_array = vec![Some(1)];
-    let tree_array = vec![Some(9), None, Some(3), Some(6)];
+    //let tree_array = vec![Some(9), None, Some(3), Some(6)];
     let root = create_tree(&tree_array, 0);
     let good_nodes = Solution::good_nodes(root);
     println!("Good nodes: {0}", good_nodes);
@@ -49,14 +49,13 @@ impl TreeNode {
 
 struct Solution {}
 
-use std::borrow::Borrow;
 use std::cell::RefCell;
 use std::rc::Rc;
 impl Solution {
     pub fn good_nodes(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
         if let Some(r) = &root {
             let val = r.borrow().val;
-            Solution::dfs(&root, None)
+            Solution::dfs(&root, val)
         } else {
             0
         }
