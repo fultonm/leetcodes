@@ -1,8 +1,8 @@
 fn main() {
-    let tree_array = vec![Some(3), Some(1), Some(4), Some(3), None, Some(1), Some(5)];
+    //let tree_array = vec![Some(3), Some(1), Some(4), Some(3), None, Some(1), Some(5)];
     //let tree_array = vec![Some(3), Some(3), None, Some(4), Some(2)];
     //let tree_array = vec![Some(1)];
-    //let tree_array = vec![Some(9), None, Some(3), Some(6)];
+    let tree_array = vec![Some(9), None, Some(3), Some(6)];
     let root = create_tree(&tree_array, 0);
     let good_nodes = Solution::good_nodes(root);
     println!("Good nodes: {0}", good_nodes);
@@ -53,23 +53,21 @@ use std::cell::RefCell;
 use std::rc::Rc;
 impl Solution {
     pub fn good_nodes(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
-        if let Some(r) = &root {
-            let val = r.borrow().val;
-            Solution::dfs(&root, val)
-        } else {
-            0
-        }
-    }
+        let mut good_node_count = 0;
+        let mut s = Vec::with_capacity(10_000);
+        s.push((root, i32::MIN));
 
-    fn dfs(node: &Option<Rc<RefCell<TreeNode>>>, max: i32) -> i32 {
-        if let Some(n) = node {
-            let val = n.borrow().val;
-            let m = max.max(val);
-            (if m == val { 1 } else { 0 })
-                + Solution::dfs(&n.borrow().left, m)
-                + Solution::dfs(&n.borrow().right, m)
-        } else {
-            0
+        while let Some((node, max)) = s.pop() {
+            if let Some(n) = node {
+                let val = n.borrow().val;
+                if val >= max {
+                    good_node_count += 1;
+                }
+                s.push((n.borrow().left.clone(), val));
+                s.push((n.borrow().right.clone(), val));
+            }
         }
+
+        good_node_count
     }
 }
