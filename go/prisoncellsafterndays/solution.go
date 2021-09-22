@@ -1,17 +1,8 @@
-package main
+package prisoncellsafterndays
 
 import (
 	"fmt"
 )
-
-func main() {
-	t1 := []int{1, 1, 0, 1, 0, 0, 1, 0}
-	n := 3
-	// fmt.Printf("     Original %v\n", t1)
-	fmt.Printf("After %d days: %v\n", n, prisonAfterNDays(t1, n))
-	//fmt.Printf("%d", cellsToBitstring([]int{1, 1, 1, 0, 1}))
-	//fmt.Println(intPow(2, 8))
-}
 
 func prisonAfterNDays(cells []int, n int) []int {
 	if n <= 0 {

@@ -1,15 +1,8 @@
-package main
+package reverseinteger
 
 import (
-	"fmt"
 	"math"
 )
-
-// 2147483647
-// 1987654321
-func main() {
-	fmt.Printf("%d\n", reverse(-123123))
-}
 
 func reverse(x int) int {
 	sign := 1
