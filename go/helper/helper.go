@@ -6,9 +6,29 @@ import (
 	"time"
 )
 
-func Assert(result int, expect int, t *testing.T) {
+func AssertInt(result int, expect int, t *testing.T) {
 	if result != expect {
 		t.Fatalf("Expected %v, got %v", expect, result)
+	}
+}
+
+func AssertIntArr(result []int, expect []int, t *testing.T) {
+	wR, wE := len(result), len(expect)
+	if wR != wE {
+		t.Fatalf("Expected width %v does not match result width %v", wR, wE)
+	}
+	for i := 0; i < wR; i++ {
+		AssertInt(result[i], expect[i], t)
+	}
+}
+
+func AssertIntArr2d(result [][]int, expect [][]int, t *testing.T) {
+	hR, hE := len(result), len(expect)
+	if hR != hE {
+		t.Fatalf("Expected height %v does not match result height %v", hR, hE)
+	}
+	for i := 0; i < hR; i++ {
+		AssertIntArr(result[i], expect[i], t)
 	}
 }
 
@@ -70,6 +90,13 @@ func MinInt(args ...int) int {
 }
 
 const IntMax = int(^uint(0) >> 1)
+
+func AbsInt(n int) int {
+	if n < 0 {
+		return n * -1
+	}
+	return n
+}
 
 func SelectionSortInt(arr []int) {
 	findMinIdx := func(s int, arr []int) int {

@@ -2,19 +2,16 @@ package maximumsubarray
 
 import "main/helper"
 
-func MSA(nums []int) int {
+func MaxSubArray(nums []int) int {
 	return maxSubArray(nums)
 }
 
 func maxSubArray(nums []int) int {
 	n := len(nums)
-	prev := nums[0]
-	max := prev
+	max := nums[0]
 	for i := 1; i < n; i++ {
-		prev = helper.MaxInt(prev+nums[i], nums[i])
-		if prev > max {
-			max = prev
-		}
+		nums[i] = helper.MaxInt(nums[i-1]+nums[i], nums[i])
+		max = helper.MaxInt(max, nums[i])
 	}
 	return max
 }
