@@ -1,4 +1,4 @@
-package prisoncellsafterndays
+package main
 
 import (
 	"fmt"

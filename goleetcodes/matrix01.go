@@ -1,10 +1,27 @@
-package matrix01
+package main
 
 func UpdateMatrix(mat [][]int) [][]int {
 	return updateMatrix(mat)
 }
 
 func updateMatrix(mat [][]int) [][]int {
+	type Point struct {
+		y int
+		x int
+	}
+
+	poll := func(q *[]Point) Point {
+		p := (*q)[0]
+		*q = (*q)[1:]
+		return p
+	}
+
+	offer := func(q *[]Point, p Point) {
+		*q = append(*q, p)
+	}
+
+	const IntMax = int(^uint(0) >> 1)
+
 	m, n := len(mat), len(mat[0])
 	q := []Point{}
 	for i := 0; i < m; i++ {
@@ -41,30 +58,3 @@ func updateMatrix(mat [][]int) [][]int {
 
 	return mat
 }
-
-type Point struct {
-	y int
-	x int
-}
-
-func poll(q *[]Point) Point {
-	p := (*q)[0]
-	*q = (*q)[1:]
-	return p
-}
-
-func offer(q *[]Point, p Point) {
-	*q = append(*q, p)
-}
-
-func MinInt(args ...int) int {
-	r := IntMax
-	for _, e := range args {
-		if e < r {
-			r = e
-		}
-	}
-	return r
-}
-
-const IntMax = int(^uint(0) >> 1)

@@ -1,4 +1,4 @@
-package concatenationofarray
+package main
 
 func getConcatenation(nums []int) []int {
 	n := len(nums)
