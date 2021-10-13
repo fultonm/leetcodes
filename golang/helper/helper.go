@@ -134,7 +134,6 @@ func MaxInt(args ...int) int {
 	}
 	return r
 }
-
 func MinInt(args ...int) int {
 	if len(args) == 0 {
 		return IntMin
