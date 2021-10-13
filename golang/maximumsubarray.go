@@ -1,10 +1,16 @@
 package main
 
-func MaxSubArray(nums []int) int {
-	return maxSubArray(nums)
-}
-
 func maxSubArray(nums []int) int {
+	const IntMin = -int(^uint(0)>>1) - 1
+	MaxInt := func(args ...int) int {
+		r := IntMin
+		for _, e := range args {
+			if e > r {
+				r = e
+			}
+		}
+		return r
+	}
 	n := len(nums)
 	max := nums[0]
 	for i := 1; i < n; i++ {

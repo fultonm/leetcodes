@@ -1,0 +1,142 @@
+package main
+
+import (
+    "bufio"
+    "fmt"
+    "io"
+    "os"
+    "strconv"
+    "strings"
+)
+
+
+
+/*
+ * Complete the 'foo' function below.
+ *
+ * The function is expected to return an INTEGER.
+ * The function accepts following parameters:
+ *  1. STRING_ARRAY codeList
+ *  2. STRING_ARRAY shoppingCart
+ */
+ 
+ //
+
+func foo(codeList []string, shoppingCart []string) int32 {
+    matches := 0
+    pos := 0
+    OUTER:
+    for _, pattern := range codeList {
+        patternEls := strings.Split(pattern, " ")
+        for pos < len(shoppingCart) {
+            if match(patternEls, shoppingCart[pos:]) {
+                matches++
+                pos += len(pattern)
+                continue OUTER
+            }
+            pos++
+        }
+    }
+    if len(codeList) == matches {
+        return 1
+    } else {
+        return 0
+    }
+}
+
+func match(patternEls []string, cart []string) bool {
+    if len(patternEls) > len(cart) {
+        return false
+    }    
+    fmt.Printf("patternels: %v, cart: %v\n", patternEls, cart)
+    for i := 0; i < len(patternEls); i++ {
+        if patternEls[i] == "anything" {
+            continue
+        } else if cart[i] != patternEls[i] {
+            return false
+        }
+    }
+    return true
+}
+
+func main() {
+
+
+
+
+
+
+	package main
+
+import (
+    "bufio"
+    "fmt"
+    "io"
+    "os"
+    "strconv"
+    "strings"
+    "sort"
+)
+
+
+
+/*
+ * Complete the 'searchSuggestions' function below.
+ *
+ * The function is expected to return a 2D_STRING_ARRAY.
+ * The function accepts following parameters:
+ *  1. STRING_ARRAY repository
+ *  2. STRING customerQuery
+ */
+ 
+ // input = [cup, cupboard, cutlery, cutting board, cut carrots]
+ // c - emtpy array
+ //
+ // input: Cuttping board -
+ // suggestions = [[cup, cupboard, cut carrots], [cut carrots, cutlery, cutting board], [cutting board], ]
+ // input = [cup, cupboard, cut carrots, cutlery, cutting board]
+ // querySubstring = cutt
+ // i = 3, custQuerylen = 14
+ // candidates = [] , candFound = 0
+ //reviewword = 
+ 
+ // apple, [apple]
+// suggestions = [apple, ]
+
+
+func searchSuggestions(repository []string, customerQuery string) [][]string {
+    if len(customerQuery) < 2 {
+        return [][]string{}
+    }
+    suggestions := [][]string{}
+    sort.Strings(repository)
+    querySubstring := strings.ToLower(string(customerQuery[0]))
+    for i := 1; i < len(customerQuery); i++ {
+        querySubstring += strings.ToLower(string(customerQuery[i]))
+        candidates := []string{}
+        candidatesFound := 0
+        for _, reviewWord := range repository {
+            reviewWord = strings.ToLower(reviewWord)
+            if strings.HasPrefix(reviewWord, querySubstring) {
+                candidates = append(candidates, reviewWord)
+                candidatesFound++
+            }
+            if candidatesFound >= 3 {
+                break
+            }
+        }
+        if len(candidates) == 0 {
+            // Fill the rest of the suggestions array with empty arrays?
+            // len customer query = 10
+            // suggestions = 9, append 0 arrays
+            // suggestions = 0, append 9 arrays
+            suggestions = append(suggestions, make([][]string, len(customerQuery) - len(suggestions) - 1)...)
+            break
+        } else {
+            suggestions = append(suggestions, candidates)
+        }
+    }
+    return suggestions
+}
+
+func main() {
