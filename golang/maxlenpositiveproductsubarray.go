@@ -1,88 +1,177 @@
 package main
 
-type SubarrayMarkers struct {
-	val   int
-	left  int
-	right int
+type Marker struct {
+	left int
+	len  int
 }
 
 func getMaxLen(nums []int) int {
-	subarray := maxLenPosProductSubarray(nums, 0, len(nums))
-	return subarray.right - subarray.left
+	return mlps(nums, 0, len(nums)).len
 }
 
-func maxLenPosProductSubarray(nums []int, left int, right int) SubarrayMarkers {
+func mlps(nums []int, j int, k int) Marker {
 	/** Helpers */
 	const IntMax = int(^uint(0) >> 1)
 	const IntMin = -int(^uint(0)>>1) - 1
-	MaxLenPosSubarrayMarkers := func(args ...SubarrayMarkers) SubarrayMarkers {
+	MaxInt := func(args ...int) int {
 		if len(args) == 0 {
-			return SubarrayMarkers{0, -1, -1}
+			return IntMax
 		}
-		r := SubarrayMarkers{0, -1, -1}
+		r := IntMin
 		for _, e := range args {
-			if e.val > 0 && e.right-e.left > r.right-r.left {
+			if e > r {
 				r = e
 			}
 		}
 		return r
 	}
-	/** Solution start */
-	n := right - left
+	MinInt := func(args ...int) int {
+		if len(args) == 0 {
+			return IntMin
+		}
+		r := IntMax
+		for _, e := range args {
+			if e < r {
+				r = e
+			}
+		}
+		return r
+	}
+	MaxLenMarker := func(args ...Marker) Marker {
+		r := Marker{-1, 0}
+		if len(args) == 0 {
+			return r
+		}
+		for _, e := range args {
+			if e.len > r.len {
+				r = e
+			}
+		}
+		return r
+	}
+	MarkersValid := func(args ...Marker) bool {
+		for _, e := range args {
+			if e.left < 0 || e.len < 0 {
+				return false
+			}
+		}
+		return true
+	}
+	/** Solution */
+	n := k - j
 	if n == 0 {
-		return SubarrayMarkers{0, -1, -1}
+		return Marker{left: -1, len: 0}
 	} else if n == 1 {
-		if nums[left] > 0 {
-			return SubarrayMarkers{nums[left], left, right}
+		if nums[j] > 0 {
+			return Marker{left: j, len: 1}
 		} else {
-			return SubarrayMarkers{0, -1, -1}
+			return Marker{left: -1, len: 0}
 		}
 	}
-	m := left + (n / 2)
-	maxLenLeft := maxLenPosProductSubarray(nums, left, m)
-	maxLenRight := maxLenPosProductSubarray(nums, m, right)
-	productCrossLeft := 1
-	posProdCrossLeft, negProdCrossLeft := 0, 0
-	posProdCrossLeftIndex, negProdCrossLeftIndex := -1, -1
-	for i := m - 1; i >= left; i-- {
-		productCrossLeft *= nums[i]
-		if productCrossLeft == 0 {
+	m := j + ((k - j) / 2)
+	maxLeft := mlps(nums, j, m)
+	maxRight := mlps(nums, m, k)
+	// cross left
+	leftNegCount, leftmostNeg, leftmostPos := 0, IntMax, IntMax
+	for i := m - 1; i >= j; i-- {
+		if nums[i] == 0 {
 			break
-		} else if productCrossLeft > 0 {
-			posProdCrossLeft = productCrossLeft
-			posProdCrossLeftIndex = i
-		}
-		if productCrossLeft < 0 {
-			negProdCrossLeft = productCrossLeft
-			negProdCrossLeftIndex = i
+		} else if nums[i] < 0 {
+			leftNegCount++
+			leftmostNeg = i
+		} else {
+			leftmostPos = i
 		}
 	}
-	productCrossRight := 1
-	posProdCrossRight, negProdCrossRight := 0, 0
-	posProdCrossRightIndex, negProdCrossRightIndex := -1, -1
-	for i := m; i < right; i++ {
-		productCrossRight *= nums[i]
-		if productCrossRight == 0 {
+	leftmostPosProdIdx := IntMax
+	leftmostNegProdIdx := IntMax
+	if leftNegCount%2 == 0 {
+		leftmostPosProdIdx = MinInt(leftmostNeg, leftmostPos)
+		if leftNegCount > 0 {
+			leftmostNegProdIdx = leftmostNeg + 1
+		}
+	} else {
+		leftmostNegProdIdx = MinInt(leftmostNeg, leftmostPos)
+		if leftmostNegProdIdx < m-1 {
+			leftmostPosProdIdx = leftmostNeg + 1
+		}
+	}
+	maxCrossLeftPosProd := Marker{left: -1, len: 0}
+	if leftmostPosProdIdx != IntMax {
+		maxCrossLeftPosProd = Marker{
+			left: leftmostPosProdIdx,
+			len:  m - leftmostPosProdIdx,
+		}
+	}
+	maxCrossLeftNegProd := Marker{left: -1, len: 0}
+	if leftmostNegProdIdx != IntMax {
+		maxCrossLeftNegProd = Marker{
+			left: leftmostNegProdIdx,
+			len:  m - leftmostNegProdIdx,
+		}
+	}
+	// cross right
+	rightNegCount, rightmostNeg, rightmostPos := 0, IntMin, IntMin
+	for i := m; i < k; i++ {
+		if nums[i] == 0 {
 			break
-		}
-		if productCrossRight > 0 {
-			posProdCrossRight = productCrossRight
-			posProdCrossRightIndex = i
-		}
-		if productCrossRight < 0 {
-			negProdCrossRight = productCrossRight
-			negProdCrossRightIndex = i
+		} else if nums[i] < 0 {
+			rightNegCount++
+			rightmostNeg = i
+		} else {
+			rightmostPos = i
 		}
 	}
-	maxLenPosPosCross := SubarrayMarkers{
-		val:   posProdCrossLeft * posProdCrossRight,
-		left:  posProdCrossLeftIndex,
-		right: posProdCrossRightIndex + 1,
+	rightmostPosProdIdx := IntMin
+	rightmostNegProdIdx := IntMin
+	if rightNegCount%2 == 0 {
+		rightmostPosProdIdx = MaxInt(rightmostNeg, rightmostPos)
+		if rightNegCount > 0 {
+			rightmostNegProdIdx = rightmostNeg - 1
+		}
+	} else {
+		rightmostNegProdIdx = MaxInt(rightmostNeg, rightmostPos)
+		if rightmostNegProdIdx > m {
+			rightmostPosProdIdx = rightmostNeg - 1
+		}
 	}
-	maxLenNegNegCross := SubarrayMarkers{
-		val:   negProdCrossLeft * negProdCrossRight,
-		left:  negProdCrossLeftIndex,
-		right: negProdCrossRightIndex + 1,
+	maxCrossRightPosProd := Marker{left: -1, len: 0}
+	if rightmostPosProdIdx != IntMin {
+		maxCrossRightPosProd = Marker{
+			left: m,
+			len:  rightmostPosProdIdx - m + 1,
+		}
 	}
-	return MaxLenPosSubarrayMarkers(maxLenLeft, maxLenRight, maxLenPosPosCross, maxLenNegNegCross)
+	maxCrossRightNegProd := Marker{-1, -1}
+	if rightmostNegProdIdx != IntMin {
+		maxCrossRightNegProd = Marker{
+			left: m,
+			len:  rightmostNegProdIdx - m + 1,
+		}
+	}
+	maxCross := Marker{left: -1, len: 0}
+	if MarkersValid(maxCrossLeftPosProd, maxCrossRightPosProd, maxCrossLeftNegProd, maxCrossRightNegProd) {
+		if maxCrossLeftPosProd.len+maxCrossRightPosProd.len > maxCrossLeftNegProd.len+maxCrossRightNegProd.len {
+			maxCross = Marker{
+				left: maxCrossLeftPosProd.left,
+				len:  maxCrossLeftPosProd.len + maxCrossRightPosProd.len,
+			}
+		} else {
+			maxCross = Marker{
+				left: maxCrossLeftNegProd.left,
+				len:  maxCrossLeftNegProd.len + maxCrossRightNegProd.len,
+			}
+		}
+	} else if MarkersValid(maxCrossLeftPosProd, maxCrossRightPosProd) {
+		maxCross = Marker{
+			left: maxCrossLeftPosProd.left,
+			len:  maxCrossLeftPosProd.len + maxCrossRightPosProd.len,
+		}
+	} else if MarkersValid(maxCrossLeftNegProd, maxCrossRightNegProd) {
+		maxCross = Marker{
+			left: maxCrossLeftNegProd.left,
+			len:  maxCrossLeftNegProd.len + maxCrossRightNegProd.len,
+		}
+	}
+	return MaxLenMarker(maxLeft, maxRight, maxCross)
 }
