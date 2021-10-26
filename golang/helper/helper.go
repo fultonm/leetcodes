@@ -6,6 +6,12 @@ import (
 	"time"
 )
 
+func Assert(result bool, expect bool, t *testing.T) {
+	if result != expect {
+		t.Fatalf("Expected %v, got %v", expect, result)
+	}
+}
+
 func AssertInt(result int, expect int, t *testing.T) {
 	if result != expect {
 		t.Fatalf("Expected %v, got %v", expect, result)
